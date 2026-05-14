@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -116,10 +117,25 @@
             background: #e3f2fd;
         }
 
-        .priority-low.selected { border-color: #28a745; background: #d4edda; }
-        .priority-normal.selected { border-color: #007bff; background: #cce5ff; }
-        .priority-high.selected { border-color: #ffc107; background: #fff3cd; }
-        .priority-urgent.selected { border-color: #dc3545; background: #f8d7da; }
+        .priority-low.selected {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .priority-normal.selected {
+            border-color: #007bff;
+            background: #cce5ff;
+        }
+
+        .priority-high.selected {
+            border-color: #ffc107;
+            background: #fff3cd;
+        }
+
+        .priority-urgent.selected {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
 
         .category-option.selected {
             border-color: #4a90e2;
@@ -186,7 +202,7 @@
             border-radius: 8px;
             padding: 15px;
             text-align: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .stat-number {
@@ -206,26 +222,66 @@
             border: none;
             border-top: 1px solid #eee;
         }
+
+        /* NEW: Character counter + preview box */
+
+        .char-counter {
+            text-align: right;
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .preview-box {
+            margin-top: 20px;
+            background: #f8f9fa;
+            border-left: 4px solid #4a90e2;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .preview-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .preview-content {
+            color: #555;
+            min-height: 40px;
+            white-space: pre-wrap;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
-        
+
 
         <div class="card">
             <h1> Send Slack Message</h1>
-        
+
 
             @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
+            <div class="alert alert-success">{{ session('success') }}</div>
             @endif
 
             <form method="POST" action="{{ url('/send-message') }}">
                 @csrf
-                
+
                 <div class="form-group">
                     <label for="message">Message *</label>
-                    <textarea id="message" name="message" placeholder="Enter your message here..." required></textarea>
+
+                    <textarea
+                        id="message"
+                        name="message"
+                        maxlength="500"
+                        placeholder="Enter your message here..."
+                        required></textarea>
+
+                    <div class="char-counter">
+                        <span id="charCount">0</span>/500
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -290,11 +346,23 @@
                 <button type="submit">Send to Slack</button>
             </form>
 
+            <div class="preview-box">
+
+                <div class="preview-title">
+                    Live Preview
+                </div>
+
+                <div id="previewText" class="preview-content">
+                    Your message preview appears here...
+                </div>
+
+            </div>
+
             <hr>
 
             <div class="nav-links">
                 <a href="{{ url('/messages') }}"> View Messages</a>
-              
+
                 <a href="{{ url('/export-messages') }}"> Export CSV</a>
             </div>
         </div>
@@ -322,6 +390,22 @@
         // Set default selected
         document.querySelector('.priority-option[data-value="normal"]').classList.add('selected');
         document.querySelector('.category-option[data-value="info"]').classList.add('selected');
+
+        // Character counter + live preview
+
+        const textarea = document.getElementById('message');
+        const counter = document.getElementById('charCount');
+        const preview = document.getElementById('previewText');
+
+        textarea.addEventListener('input', function() {
+
+            counter.innerText = this.value.length;
+
+            preview.innerText =
+                this.value || "Your message preview appears here...";
+
+        }); 
     </script>
 </body>
+
 </html>
